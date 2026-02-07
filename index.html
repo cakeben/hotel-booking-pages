@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel Booker</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f5f7fb; margin:0; padding:2rem; }
+    .card { max-width:680px; margin:0 auto; background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.08); }
+    h1 { margin-top:0; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+    label { display:block; font-weight:600; margin-bottom:.35rem; }
+    input, select, button { width:100%; padding:.65rem; border:1px solid #d8deea; border-radius:8px; }
+    button { background:#2563eb; color:#fff; border:none; font-weight:700; cursor:pointer; }
+    .full { grid-column:1 / -1; }
+    .result { margin-top:1rem; padding:.75rem; background:#ecfeff; border:1px solid #a5f3fc; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Hotel Booking Prototype</h1>
+    <p>Simple GitHub Pages starter for hotel booking requests.</p>
+    <form id="bookingForm" class="grid">
+      <div>
+        <label for="city">City</label>
+        <input id="city" required placeholder="e.g. London" />
+      </div>
+      <div>
+        <label for="guests">Guests</label>
+        <select id="guests"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      </div>
+      <div>
+        <label for="checkin">Check-in</label>
+        <input id="checkin" type="date" required />
+      </div>
+      <div>
+        <label for="checkout">Check-out</label>
+        <input id="checkout" type="date" required />
+      </div>
+      <div class="full"><button type="submit">Search Hotels</button></div>
+    </form>
+    <div id="result" class="result" hidden></div>
+  </main>
+  <script>
+    document.getElementById("bookingForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const city = document.getElementById("city").value;
+      const guests = document.getElementById("guests").value;
+      const checkin = document.getElementById("checkin").value;
+      const checkout = document.getElementById("checkout").value;
+      const box = document.getElementById("result");
+      box.hidden = false;
+      box.textContent = `Searching hotels in ${city} for ${guests} guest(s), ${checkin} to ${checkout}…`;
+    });
+  </script>
+</body>
+</html>
