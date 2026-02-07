@@ -5,52 +5,240 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hotel Booker</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f5f7fb; margin:0; padding:2rem; }
-    .card { max-width:680px; margin:0 auto; background:#fff; padding:1.5rem; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.08); }
-    h1 { margin-top:0; }
-    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
-    label { display:block; font-weight:600; margin-bottom:.35rem; }
-    input, select, button { width:100%; padding:.65rem; border:1px solid #d8deea; border-radius:8px; }
-    button { background:#2563eb; color:#fff; border:none; font-weight:700; cursor:pointer; }
-    .full { grid-column:1 / -1; }
-    .result { margin-top:1rem; padding:.75rem; background:#ecfeff; border:1px solid #a5f3fc; border-radius:8px; }
+    :root {
+      --bg: #0b1020;
+      --panel: #11182e;
+      --muted: #9aa5c3;
+      --text: #e7ecff;
+      --accent: #4f8cff;
+      --accent-2: #76e4f7;
+      --ok: #14b8a6;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --border: #243255;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 20% -10%, #1a2a57, transparent), var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .hero { margin-bottom: 18px; }
+    .hero h1 { margin: 0 0 6px; font-size: 1.8rem; }
+    .hero p { margin: 0; color: var(--muted); }
+
+    .panel {
+      background: linear-gradient(180deg, #121b35 0%, var(--panel) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 35px rgba(0,0,0,.35);
+    }
+
+    form.grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    @media (max-width: 860px) { form.grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { form.grid { grid-template-columns: 1fr; } }
+
+    label { display:block; font-weight:600; font-size:.92rem; margin-bottom:6px; }
+    input, select, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      font-size: .95rem;
+      background: #0f1630;
+      color: var(--text);
+    }
+    input:focus, select:focus { outline: 2px solid #3b82f680; border-color: #3b82f6; }
+    button {
+      border: none;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #081024;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button[disabled] { opacity: .65; cursor: not-allowed; }
+
+    .hint { margin-top: 10px; color: var(--muted); font-size: .88rem; }
+    .error {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #7f1d1d;
+      background: #3b1212;
+      color: #fecaca;
+      display: none;
+    }
+
+    .status {
+      margin: 14px 0 4px;
+      color: #bfdbfe;
+      min-height: 1.2em;
+      font-size: .95rem;
+    }
+
+    .results {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #0d1530;
+    }
+    .name { font-weight: 700; margin: 0 0 6px; }
+    .meta { margin: 0; color: var(--muted); font-size: .9rem; }
+    .price { margin-top: 8px; color: #86efac; font-weight: 800; }
+    .tag {
+      display:inline-block; margin-top:8px; font-size:.78rem; padding:3px 8px;
+      border-radius:999px; background:#083344; color:#a5f3fc; border:1px solid #155e75;
+    }
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>Hotel Booking Prototype</h1>
-    <p>Simple GitHub Pages starter for hotel booking requests.</p>
-    <form id="bookingForm" class="grid">
-      <div>
-        <label for="city">City</label>
-        <input id="city" required placeholder="e.g. London" />
-      </div>
-      <div>
-        <label for="guests">Guests</label>
-        <select id="guests"><option>1</option><option>2</option><option>3</option><option>4</option></select>
-      </div>
-      <div>
-        <label for="checkin">Check-in</label>
-        <input id="checkin" type="date" required />
-      </div>
-      <div>
-        <label for="checkout">Check-out</label>
-        <input id="checkout" type="date" required />
-      </div>
-      <div class="full"><button type="submit">Search Hotels</button></div>
-    </form>
-    <div id="result" class="result" hidden></div>
-  </main>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Hotel Booker</h1>
+      <p>Fast prototype: enter details, get sample options instantly.</p>
+    </div>
+
+    <section class="panel">
+      <form id="bookingForm" class="grid" novalidate>
+        <div>
+          <label for="city">City</label>
+          <input id="city" required placeholder="e.g. London" />
+        </div>
+        <div>
+          <label for="guests">Guests</label>
+          <select id="guests">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+          </select>
+        </div>
+        <div>
+          <label for="checkin">Check-in</label>
+          <input id="checkin" type="date" required />
+        </div>
+        <div>
+          <label for="checkout">Check-out</label>
+          <input id="checkout" type="date" required />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <button id="searchBtn" type="submit">Search hotels</button>
+        </div>
+      </form>
+
+      <div class="hint">This demo returns mock results (next step is wiring real APIs).</div>
+      <div id="error" class="error"></div>
+      <div id="status" class="status"></div>
+      <div id="results" class="results" aria-live="polite"></div>
+    </section>
+  </div>
+
   <script>
-    document.getElementById("bookingForm").addEventListener("submit", (e) => {
+    const form = document.getElementById("bookingForm");
+    const statusEl = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
+    const errorEl = document.getElementById("error");
+    const searchBtn = document.getElementById("searchBtn");
+
+    const mockByCity = {
+      london: [
+        { name: "The Borough Stay", stars: 4, area: "Southwark", price: 149, tag: "Great location" },
+        { name: "Canary Quays Hotel", stars: 5, area: "Canary Wharf", price: 239, tag: "Business friendly" },
+        { name: "Paddington Rooms", stars: 3, area: "Paddington", price: 119, tag: "Best value" }
+      ],
+      manchester: [
+        { name: "Northern Lights Inn", stars: 4, area: "Ancoats", price: 132, tag: "Top rated" },
+        { name: "MediaCity Suites", stars: 4, area: "Salford", price: 141, tag: "Modern" }
+      ]
+    };
+
+    function nightsBetween(start, end) {
+      const ms = new Date(end) - new Date(start);
+      return Math.round(ms / (1000 * 60 * 60 * 24));
+    }
+
+    function stars(n) { return "★".repeat(n) + "☆".repeat(5 - n); }
+
+    function clearFeedback() {
+      errorEl.style.display = "none";
+      errorEl.textContent = "";
+      statusEl.textContent = "";
+      resultsEl.innerHTML = "";
+    }
+
+    function showError(msg) {
+      errorEl.style.display = "block";
+      errorEl.textContent = msg;
+    }
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const city = document.getElementById("city").value;
-      const guests = document.getElementById("guests").value;
+      clearFeedback();
+
+      const city = document.getElementById("city").value.trim();
+      const guests = Number(document.getElementById("guests").value);
       const checkin = document.getElementById("checkin").value;
       const checkout = document.getElementById("checkout").value;
-      const box = document.getElementById("result");
-      box.hidden = false;
-      box.textContent = `Searching hotels in ${city} for ${guests} guest(s), ${checkin} to ${checkout}…`;
+
+      if (!city || !checkin || !checkout) {
+        showError("Please fill out city, check-in, and check-out.");
+        return;
+      }
+
+      const nights = nightsBetween(checkin, checkout);
+      if (Number.isNaN(nights) || nights <= 0) {
+        showError("Check-out must be after check-in.");
+        return;
+      }
+
+      searchBtn.disabled = true;
+      searchBtn.textContent = "Searching...";
+      statusEl.textContent = `Finding stays in ${city} for ${guests} guest(s), ${nights} night(s)...`;
+
+      await new Promise((r) => setTimeout(r, 700));
+
+      const key = city.toLowerCase();
+      const base = mockByCity[key] || [
+        { name: `${city} Central Hotel`, stars: 4, area: "City Centre", price: 139, tag: "Popular" },
+        { name: `${city} Riverside Suites`, stars: 5, area: "Riverside", price: 214, tag: "Premium" },
+        { name: `${city} Budget Rooms`, stars: 3, area: "Old Town", price: 96, tag: "Cheapest" }
+      ];
+
+      const multiplier = 1 + (guests - 1) * 0.12;
+      const withTotals = base.map(h => ({
+        ...h,
+        total: Math.round(h.price * nights * multiplier)
+      }));
+
+      statusEl.textContent = `Found ${withTotals.length} options.`;
+
+      for (const hotel of withTotals) {
+        const el = document.createElement("article");
+        el.className = "card";
+        el.innerHTML = `
+          <p class="name">${hotel.name}</p>
+          <p class="meta">${stars(hotel.stars)} · ${hotel.area}</p>
+          <p class="meta">${guests} guest(s) · ${nights} night(s)</p>
+          <p class="price">£${hotel.total} total</p>
+          <span class="tag">${hotel.tag}</span>
+        `;
+        resultsEl.appendChild(el);
+      }
+
+      searchBtn.disabled = false;
+      searchBtn.textContent = "Search hotels";
     });
   </script>
 </body>
